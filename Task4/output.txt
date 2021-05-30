@@ -1,0 +1,128 @@
+-------------PAYMENT_PROCESSING----------------------
+Processing order 3 with total amount: 200
+Order 3 paid 20 via PayPal
+Order 3 paid 20 via CreditCard
+Order 3 paid 20 via Invoice
+Order 3 has insufficient paid amount 60
+
+Processing order 4 with total amount: 825,00
+Order 4 paid 100 via PayPal
+Order 4 paid 100 via CreditCard
+Order 4 has insufficient paid amount 200
+
+Processing order 5 with total amount: 50
+Order 5 paid 50 via PayPal
+Order 5 is ready for shipment
+
+Processing order 8 with total amount: 100
+Order 8 payment Invoice has failed
+Order 8 has insufficient paid amount 0
+
+Processing order 1 with total amount: 246,00
+Order 1 paid 100 via CreditCard
+Order 1 paid 200 via Invoice
+Order 1 is ready for shipment
+
+Processing order 2 with total amount: 37,50
+Order 2 paid 37,50 via CreditCard
+Order 2 is ready for shipment
+
+Processing order 7 with total amount: 700
+Order 7 paid 700 via CreditCard
+Order 7 is ready for shipment
+
+Processing order 6 with total amount: 600
+Order 6 paid 1000 via Invoice
+Order 6 is ready for shipment
+
+Processing order 9 with total amount: 2000
+Order 9 paid 1000 via PayPal
+Order 9 payment Invoice has failed
+Order 9 has insufficient paid amount 1000
+
+-------------SHIPMENT_PROCESSING----------------------
+Register orders and print order labels
+--------------------------------------------------------
+Shipment provider: LocalPost
+Janusz Pasmankiewicz
+Kozietuły 54
+Dobry początek
+90-123
+--------------------------------------------------------
+--------------------------------------------------------
+Shipment provider: Global
+Krzysztof Krawczyk
+3042  Rowes Lane
+TRIPLER ARMY MEDICAL CENTER
+96859
+Hawaii
+--------------------------------------------------------
+--------------------------------------------------------
+Shipment provider: Global
+Ely Winkl
+1147  Sherwood Circle
+Leesville
+71446
+USA
+--------------------------------------------------------
+--------------------------------------------------------
+Shipment provider: Global
+Sherlock Holmes
+221B Baker Street
+London
+NW1 6XE
+United Kingdom
+--------------------------------------------------------
+--------------------------------------------------------
+Shipment provider: Global
+Lea Mathias
+9054 Share-wood
+Manhattan
+90561
+USA
+--------------------------------------------------------
+Print bundles summaries with printable labels
+
+Shipment provider: LocalPost
+TotalPrice:      50,00, TotalTax:      11,50, TotalPriceWithTax:      61,50
+--------------------------------------------------------
+-------------------------Polska-------------------------
+ OrderId          Amount             Tax   AmountWithTax
+       5           50,00           11,50           61,50
+TOTALS:            50,00                           61,50
+
+--------------------------------------------------------
+
+
+Shipment provider: Global
+TotalPrice:     246,00, TotalTax:       0,00, TotalPriceWithTax:     246,00
+--------------------------------------------------------
+-------------------------Hawaii-------------------------
+ OrderId          Amount             Tax   AmountWithTax
+       1          246,00            0,00          246,00
+TOTALS:           246,00                          246,00
+
+--------------------------------------------------------
+
+
+Shipment provider: Global
+TotalPrice:     637,50, TotalTax:       0,00, TotalPriceWithTax:     637,50
+--------------------------------------------------------
+--------------------------USA---------------------------
+ OrderId          Amount             Tax   AmountWithTax
+       2           37,50            0,00           37,50
+       6          600,00            0,00          600,00
+TOTALS:           637,50                          637,50
+
+--------------------------------------------------------
+
+
+Shipment provider: Global
+TotalPrice:     700,00, TotalTax:     140,00, TotalPriceWithTax:     840,00
+--------------------------------------------------------
+---------------------United Kingdom---------------------
+ OrderId          Amount             Tax   AmountWithTax
+       7          700,00          140,00          840,00
+TOTALS:           700,00                          840,00
+
+--------------------------------------------------------
