@@ -1,8 +1,8 @@
 -------------PAYMENT_PROCESSING----------------------
 Processing order 3 with total amount: 200
 Order 3 paid 20 via PayPal
-Order 3 paid 20 via CreditCard
 Order 3 paid 20 via Invoice
+Order 3 paid 20 via CreditCard
 Order 3 has insufficient paid amount 60
 
 Processing order 4 with total amount: 825,00
@@ -15,13 +15,13 @@ Order 5 paid 50 via PayPal
 Order 5 is ready for shipment
 
 Processing order 8 with total amount: 100
-Order 8 payment Invoice has failed
-Order 8 has insufficient paid amount 0
+Order 8 paid 100 via Invoice
+Order 8 is ready for shipment
 
 Processing order 1 with total amount: 246,00
+Order 1 payment Invoice has failed
 Order 1 paid 100 via CreditCard
-Order 1 paid 200 via Invoice
-Order 1 is ready for shipment
+Order 1 has insufficient paid amount 100
 
 Processing order 2 with total amount: 37,50
 Order 2 paid 37,50 via CreditCard
@@ -32,13 +32,13 @@ Order 7 paid 700 via CreditCard
 Order 7 is ready for shipment
 
 Processing order 6 with total amount: 600
-Order 6 paid 1000 via Invoice
+Order 6 paid 600 via Invoice
 Order 6 is ready for shipment
 
 Processing order 9 with total amount: 2000
 Order 9 paid 1000 via PayPal
-Order 9 payment Invoice has failed
-Order 9 has insufficient paid amount 1000
+Order 9 paid 1000 via Invoice
+Order 9 is ready for shipment
 
 -------------SHIPMENT_PROCESSING----------------------
 Register orders and print order labels
@@ -50,12 +50,11 @@ Dobry początek
 90-123
 --------------------------------------------------------
 --------------------------------------------------------
-Shipment provider: Global
-Krzysztof Krawczyk
-3042  Rowes Lane
-TRIPLER ARMY MEDICAL CENTER
-96859
-Hawaii
+Shipment provider: LocalPost
+Janina Osiwiecka
+Kamionka 3/34
+Lipsko
+25-895
 --------------------------------------------------------
 --------------------------------------------------------
 Shipment provider: Global
@@ -81,26 +80,24 @@ Manhattan
 90561
 USA
 --------------------------------------------------------
+--------------------------------------------------------
+Shipment provider: Global
+Julie Lerman
+Ana Moana Blvd
+Honolulu
+96814
+Hawaii
+--------------------------------------------------------
 Print bundles summaries with printable labels
 
 Shipment provider: LocalPost
-TotalPrice:      50,00, TotalTax:      11,50, TotalPriceWithTax:      61,50
+TotalPrice:     150,00, TotalTax:      34,50, TotalPriceWithTax:     184,50
 --------------------------------------------------------
 -------------------------Polska-------------------------
  OrderId          Amount             Tax   AmountWithTax
        5           50,00           11,50           61,50
-TOTALS:            50,00                           61,50
-
---------------------------------------------------------
-
-
-Shipment provider: Global
-TotalPrice:     246,00, TotalTax:       0,00, TotalPriceWithTax:     246,00
---------------------------------------------------------
--------------------------Hawaii-------------------------
- OrderId          Amount             Tax   AmountWithTax
-       1          246,00            0,00          246,00
-TOTALS:           246,00                          246,00
+       8          100,00           23,00          123,00
+TOTALS:           150,00                          184,50
 
 --------------------------------------------------------
 
@@ -124,5 +121,16 @@ TotalPrice:     700,00, TotalTax:     140,00, TotalPriceWithTax:     840,00
  OrderId          Amount             Tax   AmountWithTax
        7          700,00          140,00          840,00
 TOTALS:           700,00                          840,00
+
+--------------------------------------------------------
+
+
+Shipment provider: Global
+TotalPrice:   2 000,00, TotalTax:       0,00, TotalPriceWithTax:   2 000,00
+--------------------------------------------------------
+-------------------------Hawaii-------------------------
+ OrderId          Amount             Tax   AmountWithTax
+       9        2 000,00            0,00        2 000,00
+TOTALS:         2 000,00                        2 000,00
 
 --------------------------------------------------------

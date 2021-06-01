@@ -10,13 +10,32 @@ namespace OrderProcessing
 {
     class Program
     {
+        public static IPaymentHandler PreparePayments()
+        {
+            var Paypal = new PayPalPaymentHandler();
+            var Invoice = new InvoicePaymentHandler();
+            var CreditCard = new CreditCardPaymentHandler();
+            Paypal.SetNext(Invoice).SetNext(CreditCard);
+            return Paypal;
+        }
+
         static void Main(string[] args)
         {
             var localOrdersDB = ProvideLocalOrders();
             var globalOrdersDB = ProvideGlobalOrders();
             var taxesDB = ProvideTaxRates();
 
+            var payment = PreparePayments();
+
             //var orders; //To implement...
+            var iterator = new LocalOrdersDBIterator(localOrdersDB);
+            var order = iterator.Next();
+            while (order != null)
+            {
+                payment.Handle(order);
+                order = iterator.Next();
+            }
+            Console.WriteLine();
             // TODO: Prepare structure to handle payments for orders from both databases
             {
                 // TODO: Commented to compile stud version
