@@ -10,15 +10,6 @@ namespace OrderProcessing
 {
     class Program
     {
-        public static IPaymentHandler PreparePayments()
-        {
-            var Paypal = new PayPalPaymentHandler();
-            var Invoice = new InvoicePaymentHandler();
-            var CreditCard = new CreditCardPaymentHandler();
-            Paypal.SetNext(Invoice).SetNext(CreditCard);
-            return Paypal;
-        }
-
         public static IOrdersDatabaseIterator GetOrdersIterator(LocalOrdersDB localOrdersDB) =>
             new LocalOrdersDBIterator(localOrdersDB);
         public static IOrdersDatabaseIterator GetOrdersIterator(GlobalOrdersDB globalOrdersDB) =>
@@ -28,16 +19,31 @@ namespace OrderProcessing
         public static IOrdersDatabaseIterator Filter(GlobalOrdersDB globalOrdersDB) =>
             new FilterIterator(GetOrdersIterator(globalOrdersDB), new FilterReadyForShipment());
 
+        public static IPaymentHandler PreparePayments()
+        {
+            var paypal = new PayPalPaymentHandler();
+            var invoice = new InvoicePaymentHandler();
+            var creditCard = new CreditCardPaymentHandler();
+            paypal.SetNext(invoice).SetNext(creditCard);
+            return paypal;
+        }
+
+        public static IShipmentHandler PrepareShipments()
+        {
+            var localShipment = new LocalPostmentHandler();
+            var globalShipment = new GlobalShipmentHandler();
+            localShipment.SetNext(globalShipment);
+            return localShipment;
+        }
+
         public static void PayForEveryOrder(IOrdersDatabaseIterator iterator)
         {
-            var payment = PreparePayments();
+            var payments = PreparePayments();
             var order = iterator.Next();
-
-
             while (order != null)
             {
                 Console.WriteLine($"Processing order {order.OrderId} with total amount: {order.DueAmount}");
-                payment.Handle(order);
+                payments.Handle(order);
                 if (order.DueAmount <= 0)
                 {
                     order.Status = OrderStatus.ReadyForShipment;
@@ -49,9 +55,39 @@ namespace OrderProcessing
                         $"{order.AmountToBePaid - order.DueAmount}");
                 }
                 Console.WriteLine();
+                order = iterator.Next();
+            }
+        }
+
+        public static void RegisterShipments(IOrdersDatabaseIterator iterator, List<IShipmentProvider> shipmentProviders, TaxRatesDB taxRatesDB)
+        {
+            var Shipments = PrepareShipments();
+            var order = iterator.Next();
+            while (order != null)
+            {
+                var provider = Shipments.Handle(order);
+                if (!shipmentProviders.Any(x => x.Name == provider.Name))
+                {
+                    shipmentProviders.Add(provider);
+                }
+                provider.RegisterForShipment(order);
+                provider.GetTaxRate(FindCorrectTax(taxRatesDB, order));
+
+                var label = provider.GetLabelForOrder(order);
+                Printer.PrintLabel(label);
 
                 order = iterator.Next();
             }
+        }
+
+        public static KeyValuePair<string, int> FindCorrectTax(TaxRatesDB taxRatesDB, Order order)
+        {
+            var taxRates = taxRatesDB.TaxRates.Where(x => x.Key == order.Recipient.Country).FirstOrDefault();
+            if (taxRates.Key == null)
+            {
+                taxRates = new KeyValuePair<string, int>(order.Recipient.Country, 0);
+            }
+            return taxRates;
         }
 
         static void Main(string[] args)
@@ -66,30 +102,17 @@ namespace OrderProcessing
             iterator = GetOrdersIterator(globalOrdersDB);
             PayForEveryOrder(iterator);
 
-            //TODO: Structure to register order, print labels per order
             Console.WriteLine("-------------SHIPMENT_PROCESSING----------------------");
             Console.WriteLine("Register orders and print order labels");
+            Console.WriteLine("--------------------------------------------------------");
 
-
-            //var ordersToShip; // To implement...
-            // TODO: Filter orders that are ready for shipping
+            var usedProviders = new List<IShipmentProvider>();
             iterator = Filter(localOrdersDB);
-            {
-                
-                //TODO: Register order to be shipped by appropriate shipment providers
-                //RegisterForShipment(IShippableOrder order);
-
-                //TODO: get printable label for Order from appropriate shipment provider
-                //GetLabelForOrder(IShippableOrder order);
-
-                var label = string.Empty;
-
-                Printer.PrintLabel(label);
-            }
+            RegisterShipments(iterator, usedProviders, taxesDB);
+            iterator = Filter(globalOrdersDB);
+            RegisterShipments(iterator, usedProviders, taxesDB);
 
             Console.WriteLine("Print parcels summaries with printable labels");
-            //TODO: Get used providers and print parcels for each provider
-            var usedProviders = Enumerable.Empty<IShipmentProvider>();
             foreach (var provider in usedProviders)
             {
                 var parcels = provider.GetParcels();

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using OrderProcessing.Orders;
@@ -7,9 +8,14 @@ namespace OrderProcessing.Shipment
 {
     class GlobalShipmentHandler : ShipmentHandler
     {
-        public override object? Handle(Order order)
+        private IShipmentProvider? _shipmentProvider = null;
+        public override IShipmentProvider? Handle(Order order)
         {
-            return base.Handle(order);
+            if (_shipmentProvider == null)
+            {
+                _shipmentProvider = new GlobalShipmentProvider();
+            }
+            return _shipmentProvider;
         }
     }
 }

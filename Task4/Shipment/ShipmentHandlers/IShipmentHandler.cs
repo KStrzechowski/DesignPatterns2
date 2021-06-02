@@ -9,6 +9,6 @@ namespace OrderProcessing.Shipment
     {
         IShipmentHandler? SetNext(IShipmentHandler? handler);
 
-        object? Handle(Order order);
+        IShipmentProvider? Handle(Order order);
     }
 }

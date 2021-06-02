@@ -5,17 +5,17 @@ using OrderProcessing.Orders;
 
 namespace OrderProcessing.Shipment
 {
-    class ShipmentHandler
+    class ShipmentHandler : IShipmentHandler
     {
-        private ShipmentHandler? _nextHandler;
+        private IShipmentHandler? _nextHandler;
 
-        public ShipmentHandler? SetNext(ShipmentHandler? handler)
+        public IShipmentHandler? SetNext(IShipmentHandler? handler)
         {
             this._nextHandler = handler;
             return handler;
         }
 
-        public virtual object? Handle(Order order)
+        public virtual IShipmentProvider? Handle(Order order)
         {
             if (this._nextHandler != null)
             {

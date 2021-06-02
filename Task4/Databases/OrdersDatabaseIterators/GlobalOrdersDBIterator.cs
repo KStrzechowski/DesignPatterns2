@@ -10,21 +10,21 @@ namespace OrderProcessing.Databases
 {
     class GlobalOrdersDBIterator : IOrdersDatabaseIterator
     {
-        private readonly Queue<OrderNode> nodeQueue = new Queue<OrderNode>();
+        private readonly Queue<OrderNode> _nodeQueue = new();
         public GlobalOrdersDBIterator(GlobalOrdersDB database)
         {
-            nodeQueue.Enqueue(database.Root);
+            _nodeQueue.Enqueue(database.Root);
         }
 
         public Order? Next()
         {
-            if (nodeQueue.Count != 0)
+            if (_nodeQueue.Count != 0)
             {
-                var currentNode = nodeQueue.Dequeue();
+                var currentNode = _nodeQueue.Dequeue();
                 if (currentNode.Left != null)
-                    nodeQueue.Enqueue(currentNode.Left);
+                    _nodeQueue.Enqueue(currentNode.Left);
                 if (currentNode.Right != null)
-                    nodeQueue.Enqueue(currentNode.Right);
+                    _nodeQueue.Enqueue(currentNode.Right);
 
                 return currentNode.Order;
             }

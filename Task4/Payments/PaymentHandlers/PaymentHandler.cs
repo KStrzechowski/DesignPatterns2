@@ -14,15 +14,15 @@ namespace OrderProcessing.Payments
 
         public IPaymentHandler? SetNext(IPaymentHandler? handler)
         {
-            this._nextHandler = handler;
+            _nextHandler = handler;
             return handler;
         }
 
         public virtual object? Handle(Order order)
         {
-            if (this._nextHandler != null)
+            if (_nextHandler != null)
             {
-                return this._nextHandler.Handle(order);
+                return _nextHandler.Handle(order);
             }
             else
             {
