@@ -30,7 +30,7 @@ namespace OrderProcessing
 
         public static IShipmentHandler PrepareShipments()
         {
-            var localShipment = new LocalPostmentHandler();
+            var localShipment = new LocalPostShipmentHandler();
             var globalShipment = new GlobalShipmentHandler();
             localShipment.SetNext(globalShipment);
             return localShipment;
@@ -62,32 +62,22 @@ namespace OrderProcessing
         public static void RegisterShipments(IOrdersDatabaseIterator iterator, List<IShipmentProvider> shipmentProviders, TaxRatesDB taxRatesDB)
         {
             var Shipments = PrepareShipments();
+            var taxRateProvider = new TaxRateProvider(taxRatesDB);
             var order = iterator.Next();
             while (order != null)
             {
-                var provider = Shipments.Handle(order);
+                var provider = Shipments.Handle(order, taxRateProvider);
                 if (!shipmentProviders.Any(x => x.Name == provider.Name))
                 {
                     shipmentProviders.Add(provider);
                 }
                 provider.RegisterForShipment(order);
-                provider.GetTaxRate(FindCorrectTax(taxRatesDB, order));
 
                 var label = provider.GetLabelForOrder(order);
                 Printer.PrintLabel(label);
 
                 order = iterator.Next();
             }
-        }
-
-        public static KeyValuePair<string, int> FindCorrectTax(TaxRatesDB taxRatesDB, Order order)
-        {
-            var taxRates = taxRatesDB.TaxRates.Where(x => x.Key == order.Recipient.Country).FirstOrDefault();
-            if (taxRates.Key == null)
-            {
-                taxRates = new KeyValuePair<string, int>(order.Recipient.Country, 0);
-            }
-            return taxRates;
         }
 
         static void Main(string[] args)

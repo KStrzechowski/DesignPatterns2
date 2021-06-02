@@ -6,22 +6,22 @@ using OrderProcessing.Orders;
 
 namespace OrderProcessing.Shipment
 {
-    class LocalPostmentHandler : ShipmentHandler
+    class LocalPostShipmentHandler : ShipmentHandler
     {
         private IShipmentProvider? _shipmentProvider = null;
-        public override IShipmentProvider? Handle(Order order)
+        public override IShipmentProvider? Handle(Order order, ITaxRateProvider taxRateProvider)
         {
             if (order.Recipient.Country == "Polska")
             {
                 if (_shipmentProvider == null)
                 {
-                    _shipmentProvider = new LocalPostShipmentProvider();
+                    _shipmentProvider = new LocalPostShipmentProvider(taxRateProvider);
                 }
                 return _shipmentProvider;
             }
             else
             {
-                return base.Handle(order);
+                return base.Handle(order, taxRateProvider);
             }
         }
     }

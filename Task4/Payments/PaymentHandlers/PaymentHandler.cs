@@ -18,15 +18,11 @@ namespace OrderProcessing.Payments
             return handler;
         }
 
-        public virtual object? Handle(Order order)
+        public virtual void Handle(Order order)
         {
             if (_nextHandler != null)
             {
-                return _nextHandler.Handle(order);
-            }
-            else
-            {
-                return null;
+                _nextHandler.Handle(order);
             }
         }
     }

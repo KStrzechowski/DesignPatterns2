@@ -10,41 +10,37 @@ namespace OrderProcessing.Payments
 {
     class PayPalPaymentHandler : BasePaymentHandler
     {
-        public override object? Handle(Order order)
+        public override void Handle(Order order)
         {
-            Payment? payment = order.SelectedPayments
-                                    .Where((x, y) => (x.PaymentType == PaymentMethod.PayPal))
-                                    .FirstOrDefault();
+            var payments = order.SelectedPayments
+                                    .Where((x, y) => (x.PaymentType == PaymentMethod.PayPal));
 
-            if (payment != null)
+            foreach (var payment in payments)
             {
-                var random = new Random(1234);
-                if (random.Next(1, 10) > 3)
+                if (order.DueAmount > 0)
                 {
-                    order.Status = OrderStatus.PaymentProcessing;
-                    if (order.DueAmount <= payment.Amount)
+                    var random = new Random(1234);
+                    if (random.Next(1, 10) > 3)
                     {
-                        payment.Amount = order.DueAmount;
+                        order.Status = OrderStatus.PaymentProcessing;
+                        if (order.DueAmount <= payment.Amount)
+                        {
+                            payment.Amount = order.DueAmount;
+                        }
+
                         Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via PayPal");
                         order.FinalizedPayments.Add(payment);
-                        return null;
                     }
                     else
                     {
-                        Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via PayPal");
-                        order.FinalizedPayments.Add(payment);
-                        return base.Handle(order);
+                        Console.WriteLine($"Order {order.OrderId} payment Paypal has failed");
                     }
                 }
-                else
-                {
-                    Console.WriteLine($"Order {order.OrderId} payment Paypal has failed");
-                    return base.Handle(order);
-                }
             }
-            else
+
+            if (order.DueAmount > 0)
             {
-                return base.Handle(order);
+                base.Handle(order);
             }
         }
     }

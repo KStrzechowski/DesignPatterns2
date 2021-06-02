@@ -12,6 +12,12 @@ namespace OrderProcessing.Shipment
         public string Name => "LocalPost";
         private int _taxRate = -1;
         private readonly List<IShippableOrder> _orders = new();
+        private readonly ITaxRateProvider _taxRateProvider;
+
+        public LocalPostShipmentProvider(ITaxRateProvider taxRateProvider)
+        {
+            _taxRateProvider = taxRateProvider;
+        }
 
         public string GetLabelForOrder(IShippableOrder order)
         {
@@ -47,13 +53,10 @@ namespace OrderProcessing.Shipment
         public void RegisterForShipment(IShippableOrder order)
         {
             _orders.Add(order);
-        }
-
-        public void GetTaxRate(KeyValuePair<string, int> taxRate)
-        {
-            if (this._taxRate < 0)
+            var taxRate = _taxRateProvider.GetCorrectTax(order);
+            if (_taxRate < 0)
             {
-                this._taxRate = taxRate.Value;
+                _taxRate = taxRate.Value;
             }
         }
     }

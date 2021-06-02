@@ -11,15 +11,15 @@ namespace OrderProcessing.Shipment
 
         public IShipmentHandler? SetNext(IShipmentHandler? handler)
         {
-            this._nextHandler = handler;
+            _nextHandler = handler;
             return handler;
         }
 
-        public virtual IShipmentProvider? Handle(Order order)
+        public virtual IShipmentProvider? Handle(Order order, ITaxRateProvider taxRateProvider)
         {
-            if (this._nextHandler != null)
+            if (_nextHandler != null)
             {
-                return this._nextHandler.Handle(order);
+                return _nextHandler.Handle(order, taxRateProvider);
             }
             else
             {

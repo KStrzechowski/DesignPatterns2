@@ -13,7 +13,5 @@ namespace OrderProcessing.Shipment
         string GetLabelForOrder(IShippableOrder order);
 
         IEnumerable<IParcel> GetParcels();
-
-        void GetTaxRate(KeyValuePair<string, int> taxRate);
     }
 }

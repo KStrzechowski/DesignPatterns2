@@ -12,6 +12,6 @@ namespace OrderProcessing.Payments
     {
         IPaymentHandler? SetNext(IPaymentHandler? handler);
 
-        object? Handle(Order order);
+        void Handle(Order order);
     }
 }

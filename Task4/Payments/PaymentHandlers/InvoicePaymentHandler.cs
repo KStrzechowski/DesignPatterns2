@@ -11,41 +11,37 @@ namespace OrderProcessing.Payments
     class InvoicePaymentHandler : BasePaymentHandler
     {
         private static int _paymentCount = 0;
-        public override object? Handle(Order order)
+        public override void Handle(Order order)
         {
-            Payment? payment = order.SelectedPayments
-                                    .Where((x, y) => (x.PaymentType == PaymentMethod.Invoice))
-                                    .FirstOrDefault();
+            var payments = order.SelectedPayments
+                                    .Where((x, y) => (x.PaymentType == PaymentMethod.Invoice));
 
-            if (payment != null)
+            foreach(var payment in payments)
             {
-                _paymentCount++;
-                if (_paymentCount % 3 != 0)
+                if (order.DueAmount > 0)
                 {
-                    order.Status = OrderStatus.PaymentProcessing;
-                    if (order.DueAmount <= payment.Amount)
+                    _paymentCount++;
+                    if (_paymentCount % 3 != 0)
                     {
-                        payment.Amount = order.DueAmount;
+                        order.Status = OrderStatus.PaymentProcessing;
+                        if (order.DueAmount <= payment.Amount)
+                        {
+                            payment.Amount = order.DueAmount;
+                        }
+
                         Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via Invoice");
                         order.FinalizedPayments.Add(payment);
-                        return null;
                     }
                     else
                     {
-                        Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via Invoice");
-                        order.FinalizedPayments.Add(payment);
-                        return base.Handle(order);
+                        Console.WriteLine($"Order {order.OrderId} payment Invoice has failed");
                     }
                 }
-                else
-                {
-                    Console.WriteLine($"Order {order.OrderId} payment Invoice has failed");
-                    return base.Handle(order);
-                }
             }
-            else
+
+            if (order.DueAmount > 0)
             {
-                return base.Handle(order);
+                base.Handle(order);
             }
         }
     }
