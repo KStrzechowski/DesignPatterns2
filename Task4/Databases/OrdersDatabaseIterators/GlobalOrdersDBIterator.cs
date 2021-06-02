@@ -6,26 +6,25 @@ using System.Text;
 using System.Threading.Tasks;
 using OrderProcessing.Orders;
 
-
 namespace OrderProcessing.Databases
 {
     class GlobalOrdersDBIterator : IOrdersDatabaseIterator
     {
-        private readonly Stack<OrderNode> nodeStack = new Stack<OrderNode>();
+        private readonly Queue<OrderNode> nodeQueue = new Queue<OrderNode>();
         public GlobalOrdersDBIterator(GlobalOrdersDB database)
         {
-            nodeStack.Push(database.Root);
+            nodeQueue.Enqueue(database.Root);
         }
 
         public Order? Next()
         {
-            if (nodeStack.Count != 0)
+            if (nodeQueue.Count != 0)
             {
-                var currentNode = nodeStack.Pop();
-                if (currentNode.Parent != null)     
-                    nodeStack.Push(currentNode.Parent);
+                var currentNode = nodeQueue.Dequeue();
+                if (currentNode.Left != null)
+                    nodeQueue.Enqueue(currentNode.Left);
                 if (currentNode.Right != null)
-                    nodeStack.Push(currentNode.Right);
+                    nodeQueue.Enqueue(currentNode.Right);
 
                 return currentNode.Order;
             }

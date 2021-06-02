@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,42 +8,44 @@ using OrderProcessing.Orders;
 
 namespace OrderProcessing.Payments
 {
-    class PayPalPaymentHandler : PaymentHandler
+    class PayPalPaymentHandler : BasePaymentHandler
     {
-        public override object Handle(Order request)
+        public override object? Handle(Order order)
         {
-            // Jak to zmienić??
-            //var item = request.SelectedPayments.Where((x, y) => (x.PaymentType == PaymentMethod.PayPal)).FirstOrDefault();
+            Payment? payment = order.SelectedPayments
+                                    .Where((x, y) => (x.PaymentType == PaymentMethod.PayPal))
+                                    .FirstOrDefault();
 
-            foreach (var Payment in request.SelectedPayments)
+            if (payment != null)
             {
-                if (Payment.PaymentType == PaymentMethod.PayPal)
+                var random = new Random(1234);
+                if (random.Next(1, 10) > 3)
                 {
-                    var random = new Random(1234);
-                    if (random.Next(1, 10) > 3)
+                    order.Status = OrderStatus.PaymentProcessing;
+                    if (order.DueAmount <= payment.Amount)
                     {
-                        request.FinalizedPayments.Add(Payment);
-                        Console.WriteLine($"Order {request.OrderId} payment Paypal was succesfull");
-                        if (request.DueAmount <= 0)
-                        {
-                            request.Status = OrderStatus.PaymentProcessing;
-                            return base.Handle(request);
-                        }
-                        else
-                        {
-                            request.Status = OrderStatus.ReadyForShipment;
-                            return base.Handle(request);
-                        }
+                        payment.Amount = order.DueAmount;
+                        Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via PayPal");
+                        order.FinalizedPayments.Add(payment);
+                        return null;
                     }
                     else
                     {
-                        Console.WriteLine($"Order {request.OrderId} payment Paypal has failed");
-                        return base.Handle(request);
+                        Console.WriteLine($"Order {order.OrderId} paid {payment.Amount} via PayPal");
+                        order.FinalizedPayments.Add(payment);
+                        return base.Handle(order);
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"Order {order.OrderId} payment Paypal has failed");
+                    return base.Handle(order);
+                }
             }
-
-            return base.Handle(request);
+            else
+            {
+                return base.Handle(order);
+            }
         }
     }
 }

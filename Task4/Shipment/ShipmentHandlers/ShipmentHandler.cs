@@ -1,18 +1,15 @@
 ﻿#nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OrderProcessing.Orders;
 
-namespace OrderProcessing.Payments
+namespace OrderProcessing.Shipment
 {
-    abstract class BasePaymentHandler : IPaymentHandler
+    class ShipmentHandler
     {
-        private IPaymentHandler? _nextHandler;
+        private ShipmentHandler? _nextHandler;
 
-        public IPaymentHandler? SetNext(IPaymentHandler? handler)
+        public ShipmentHandler? SetNext(ShipmentHandler? handler)
         {
             this._nextHandler = handler;
             return handler;

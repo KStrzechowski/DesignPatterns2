@@ -19,37 +19,63 @@ namespace OrderProcessing
             return Paypal;
         }
 
+        public static IOrdersDatabaseIterator GetOrdersIterator(LocalOrdersDB localOrdersDB) =>
+            new LocalOrdersDBIterator(localOrdersDB);
+        public static IOrdersDatabaseIterator GetOrdersIterator(GlobalOrdersDB globalOrdersDB) =>
+            new GlobalOrdersDBIterator(globalOrdersDB);
+        public static IOrdersDatabaseIterator Filter(LocalOrdersDB localOrdersDB) =>
+            new FilterIterator(GetOrdersIterator(localOrdersDB), new FilterReadyForShipment());
+        public static IOrdersDatabaseIterator Filter(GlobalOrdersDB globalOrdersDB) =>
+            new FilterIterator(GetOrdersIterator(globalOrdersDB), new FilterReadyForShipment());
+
+        public static void PayForEveryOrder(IOrdersDatabaseIterator iterator)
+        {
+            var payment = PreparePayments();
+            var order = iterator.Next();
+
+
+            while (order != null)
+            {
+                Console.WriteLine($"Processing order {order.OrderId} with total amount: {order.DueAmount}");
+                payment.Handle(order);
+                if (order.DueAmount <= 0)
+                {
+                    order.Status = OrderStatus.ReadyForShipment;
+                    Console.WriteLine($"Order {order.OrderId} is ready for shipment");
+                }
+                else
+                {
+                    Console.WriteLine($"Order {order.OrderId} has insufficient paid amount " +
+                        $"{order.AmountToBePaid - order.DueAmount}");
+                }
+                Console.WriteLine();
+
+                order = iterator.Next();
+            }
+        }
+
         static void Main(string[] args)
         {
             var localOrdersDB = ProvideLocalOrders();
             var globalOrdersDB = ProvideGlobalOrders();
             var taxesDB = ProvideTaxRates();
 
-            var payment = PreparePayments();
-
-            //var orders; //To implement...
-            var iterator = new LocalOrdersDBIterator(localOrdersDB);
-            var order = iterator.Next();
-            while (order != null)
-            {
-                payment.Handle(order);
-                order = iterator.Next();
-            }
-            Console.WriteLine();
-            // TODO: Prepare structure to handle payments for orders from both databases
-            {
-                // TODO: Commented to compile stud version
-                //Console.WriteLine($"Processing order {order.OrderId} with total amount: {order.DueAmount}");
-                // TODO: Handle order payment processing
-                Console.WriteLine();
-            }
+            Console.WriteLine("-------------PAYMENT_PROCESSING----------------------");
+            var iterator = GetOrdersIterator(localOrdersDB);
+            PayForEveryOrder(iterator);
+            iterator = GetOrdersIterator(globalOrdersDB);
+            PayForEveryOrder(iterator);
 
             //TODO: Structure to register order, print labels per order
+            Console.WriteLine("-------------SHIPMENT_PROCESSING----------------------");
             Console.WriteLine("Register orders and print order labels");
+
 
             //var ordersToShip; // To implement...
             // TODO: Filter orders that are ready for shipping
+            iterator = Filter(localOrdersDB);
             {
+                
                 //TODO: Register order to be shipped by appropriate shipment providers
                 //RegisterForShipment(IShippableOrder order);
 
